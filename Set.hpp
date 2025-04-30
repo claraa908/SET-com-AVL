@@ -60,10 +60,10 @@ class Set{
                 return p;
             }
             if(key < p->key){
-                add(p->left, key);
+                p->left = add(p->left, key);
             }
             else if(key>p->key){
-                add(p->right, key);
+                p->right = add(p->right, key);
             }
             p = fixup_node(p, key);
             return p;
@@ -78,10 +78,10 @@ class Set{
                 p->left = leftRotation(p);
                 return rightRotation(p);
             }
-            if(bal < -1 && key > p->right->key){
+            if(bal > 1 && key > p->right->key){
                 return leftRotation(p);
             }
-            if(bal < -1 && key < p->right->key){
+            if(bal > 1 && key < p->right->key){
                 p->right = rightRotation(p);
                 return leftRotation(p);
             }
@@ -113,9 +113,9 @@ class Set{
                 if(key == p->key){
                     return key;
                 }else if(key < p->key){
-                    contains(key, p->left);
+                    return contains(key, p->left);
                 }else{
-                    contains(key, p->right);
+                    return contains(key, p->right);
                 }
             }
         }
