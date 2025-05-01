@@ -4,13 +4,15 @@
 using namespace std;
 
 class Set{
+    //publicas são as que passam chaves ou nada
+    //privadas as que passam o root como parametro
     public:
         Set() {
             root = nullptr;
         }
 
-        void add( int key ){
-            root = add(root, key);
+        void insert(int key){
+            root = _insert(root, key);
         }
 
         void show(){
@@ -18,7 +20,23 @@ class Set{
         }
 
         bool contains(int key){
-            return contains(key, root) == key ? true : false;
+            return _contains(key, root);
+        }
+
+        void clear(){
+            root = _clear(root);
+        }
+
+        int maximum(){
+            return _maximum(root);
+        }
+
+        int minimum(){
+            return _minimum(root);
+        }
+
+        bool empty(){
+            return _empty(root);
         }
 
     private:
@@ -52,7 +70,8 @@ class Set{
             return u;
         }
 
-        Node* add(Node *p , int key){
+        //insert
+        Node* _insert(Node *p , int key){
             if(p == nullptr){
                 return new Node{key, 1, nullptr, nullptr};
             }
@@ -60,16 +79,16 @@ class Set{
                 return p;
             }
             if(key < p->key){
-                p->left = add(p->left, key);
+                p->left = _insert(p->left, key);
             }
             else if(key>p->key){
-                p->right = add(p->right, key);
+                p->right = _insert(p->right, key);
             }
-            p = fixup_node(p, key);
+            p = fixup_insertion(p, key);
             return p;
         }
 
-        Node* fixup_node ( Node *p , int key ){
+        Node* fixup_insertion( Node *p , int key ){
             int bal = balance(p);
             if(bal < -1 && key < p->left->key){
                 return rightRotation(p);
@@ -89,35 +108,80 @@ class Set{
             return p;
         }
 
-        void bshow(Node *node, std::string heranca) const {
+        void bshow(Node *node, string heranca) const {
         if(node != nullptr && (node->left != nullptr || node->right != nullptr))
             bshow(node->right , heranca + "r");
         for(int i = 0; i < (int) heranca.size() - 1; i++)
-            std::cout << (heranca[i] != heranca[i + 1] ? "│   " : "    ");
+            cout << (heranca[i] != heranca[i + 1] ? "│   " : "    ");
         if(heranca != "")
-            std::cout << (heranca.back() == 'r' ? "┌───" : "└───");
+            cout << (heranca.back() == 'r' ? "┌───" : "└───");
         if(node == nullptr){
-            std::cout << "#" << std::endl;
+            cout << "#" << endl;
             return;
         }
-        std::cout << node->key << std::endl;
+        cout << node->key << endl;
         if(node != nullptr && (node->left != nullptr || node->right != nullptr))
             bshow(node->left, heranca + "l");
-    }
+        }
+
 
         //contains
-        int contains(int key, Node* p){
+        //função booleana que recebe o primeiro nó da árvore e um determinado valor e verifica se este está na árvore
+        bool _contains(int key, Node* p){
             if(p == nullptr){
-                return 0;
+                return false;
+            }
+            if(key == p->key){
+                return true;
+            }
+
+            if(key < p->key){
+                return _contains(key, p->left);
             }else{
-                if(key == p->key){
-                    return key;
-                }else if(key < p->key){
-                    return contains(key, p->left);
-                }else{
-                    return contains(key, p->right);
-                }
+                return _contains(key, p->right);
             }
         }
+
+        //clear
+        Node* _clear(Node* p){
+            if(p != nullptr){
+                p->left = _clear(p->left);
+                p->right = _clear(p->right);
+                delete p;
+            }
+            return nullptr;
+        }
+
+        //minimum
+        //função que procura o nó mais a esquerda da árvore e retorna o seu valor
+        int _minimum(Node *p){
+            if(p == nullptr){
+                throw runtime_error("árvore vazia") ;
+            }
+            
+            while(p->left != nullptr){
+                p = p->left;
+            }
+            return p->key;
+        }
+
+        //maximum
+        //função que busca o nó mais a direita da árvore e retorna o seu valor
+        int _maximum(Node *p){
+            if(p == nullptr){
+                throw runtime_error("árvore vazia") ;
+            }
+            
+            while(p->right != nullptr){
+                p = p->right;
+            }
+            return p->key;
+        }
+
+        //empty
+        bool _empty(Node *p){
+            return (p == nullptr) ? true : false;
+        }
+
 };
 #endif

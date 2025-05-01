@@ -4,16 +4,23 @@ using namespace std;
 
 int main(){
     Set teste;
-    teste.add(1);
-    teste.add(2);
-    teste.add(3);
-    teste.add(4);
-    teste.add(5);
-    teste.add(6);
-    teste.add(7);
+    teste.insert(1);
+    teste.insert(2);
+    teste.insert(3);
+    teste.insert(4);
+    teste.insert(5);
+    teste.insert(6);
+    teste.insert(7);
+
+    Set t1;
     
+    t1.empty() ? cout << "True" << endl : cout << "False" << endl;
+    teste.empty() ? cout << "True" << endl : cout << "False" << endl;
     teste.contains(7) ? cout << "True" << endl : cout << "False" << endl;
     teste.contains(9) ? cout << "True" << endl : cout << "False" << endl;
 
+    cout << teste.maximum() << endl;
+    cout << teste.minimum() << endl;
     teste.show();
+    teste.clear();
 }
