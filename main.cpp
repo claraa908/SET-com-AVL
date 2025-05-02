@@ -18,9 +18,12 @@ int main(){
     teste.empty() ? cout << "True" << endl : cout << "False" << endl;
     teste.contains(7) ? cout << "True" << endl : cout << "False" << endl;
     teste.contains(9) ? cout << "True" << endl : cout << "False" << endl;
+    cout << teste.size() << endl;
+    cout << t1.size() << endl;
 
     cout << teste.maximum() << endl;
     cout << teste.minimum() << endl;
+    cout << teste.sucessor(5);
     teste.show();
     teste.clear();
 }

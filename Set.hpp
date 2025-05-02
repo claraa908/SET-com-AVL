@@ -7,8 +7,14 @@ class Set{
     //publicas são as que passam chaves ou nada
     //privadas as que passam o root como parametro
     public:
+        //construtor
         Set() {
             root = nullptr;
+        }
+
+        //destrutor
+        ~Set(){
+            root = _clear(root);
         }
 
         void insert(int key){
@@ -35,8 +41,22 @@ class Set{
             return _minimum(root);
         }
 
+        int sucessor(int key){
+            Node* aux = _sucessor(key, root, nullptr);
+            return aux != nullptr ? aux->key : throw runtime_error("não há sucessor");
+        }
+
+        int predecessor(int key){
+            Node* aux = _predecessor(key, root, nullptr);
+            return aux != nullptr ? aux->key : throw runtime_error("não há predecessor");
+        }
+
         bool empty(){
             return _empty(root);
+        }
+
+        int size(){
+            return _size(root);
         }
 
     private:
@@ -85,6 +105,60 @@ class Set{
                 p->right = _insert(p->right, key);
             }
             p = fixup_insertion(p, key);
+            return p;
+        }
+
+        //erase
+        Node* _erase(Node* p, int key){
+            if(p == nullptr){
+                return nullptr;
+            }
+            if(key < p->key){
+                p->left = _erase(p->left, key);
+            }else if(key > p->key){
+                p->right = _erase(p->right, key);
+            }else if(p->right == nullptr){
+                Node* aux = p->left;
+                delete p;
+                return aux;
+            }else{
+                p->right = remove_successor(p, p->right);
+            }
+
+            p = fixup_erase(p);
+            return p;
+        }
+
+        Node* remove_successor(Node* node, Node* p){
+            if(p->left != nullptr){
+                p = remove_successor(node, p->left);
+            }else{
+                node->key = p->key;
+                Node* aux = p->right;
+                delete p;
+                return aux;
+            }
+            p = fixup_erase(p);
+            return p;
+        }
+
+        Node* fixup_erase(Node* p){
+            int bal = balance(p);
+            if(bal < -1 && balance(p->left) <= 0){
+                return rightRotation(p);
+            }
+            if(bal < -1 && balance(p->left) > 0){
+                p->left = leftRotation(p);
+                return rightRotation(p);
+            }
+            if(bal > 1 && balance(p->right) >= 0){
+                return leftRotation(p);
+            }
+            if(bal > 1 && balance(p->right) < 0){
+                p->right = rightRotation(p);
+                return leftRotation(p);
+            }
+            p->height = 1 + max(height(p->left), height(p->right));
             return p;
         }
 
@@ -178,9 +252,69 @@ class Set{
             return p->key;
         }
 
+        //successor
+        Node* _sucessor(int key, Node* p, Node* f){
+            if(p == nullptr){
+                return nullptr;
+            }
+
+            if(p->key == key){
+                if(p->right != nullptr){
+                    Node* aux = p->right;
+                    while(aux->left != nullptr){
+                        aux = aux->left;
+                    }
+                    return aux;
+                }
+                return f;
+            }
+
+            if(p->key > key){
+                return _sucessor(key, p->left, p);
+            }
+            if(p->key < key){
+                return _sucessor(key, p->right, f);
+            }
+
+            //fazer um throw depois
+            return nullptr;
+        }
+
+        //predecessor
+        Node* _predecessor(int key, Node* p, Node* f){
+            if(p == nullptr){
+                return nullptr;
+            }
+
+            if(p->key == key){
+                if(p->left != nullptr){
+                    return p->left;
+                }
+                return f;
+            }
+
+            if(p->key > key){
+                return _predecessor(key, p->left, f);
+            }
+            if(p->key < key){
+                return _predecessor(key, p->right, p);
+            }
+
+            return nullptr;
+        }
+
         //empty
         bool _empty(Node *p){
             return (p == nullptr) ? true : false;
+        }
+
+        //size
+        int _size(Node *p){
+            if(p == nullptr){
+                return 0;
+            }
+
+            return 1 + _size(p->left) + _size(p->right);
         }
 
 };
