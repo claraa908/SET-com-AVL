@@ -13,17 +13,20 @@ int main(){
     teste.insert(7);
 
     Set t1;
-    
-    t1.empty() ? cout << "True" << endl : cout << "False" << endl;
-    teste.empty() ? cout << "True" << endl : cout << "False" << endl;
-    teste.contains(7) ? cout << "True" << endl : cout << "False" << endl;
-    teste.contains(9) ? cout << "True" << endl : cout << "False" << endl;
-    cout << teste.size() << endl;
-    cout << t1.size() << endl;
+    t1.insert(8);
 
-    cout << teste.maximum() << endl;
-    cout << teste.minimum() << endl;
-    cout << teste.sucessor(5);
+    t1.swap(teste);
+    
+    //t1.empty() ? cout << "True" << endl : cout << "False" << endl;
+    //teste.empty() ? cout << "True" << endl : cout << "False" << endl;
+    //teste.contains(7) ? cout << "True" << endl : cout << "False" << endl;
+    //teste.contains(9) ? cout << "True" << endl : cout << "False" << endl;
+    //cout << teste.size() << endl;
+    //cout << t1.size() << endl;
+
+    //cout << teste.maximum() << endl;
+    //cout << teste.minimum() << endl;
+    //cout << teste.sucessor(5);
     teste.show();
     teste.clear();
 }

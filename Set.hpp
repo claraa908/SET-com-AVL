@@ -12,6 +12,11 @@ class Set{
             root = nullptr;
         }
 
+        //construtor de cópia
+        Set(const Set& copia){
+            root = copy(copia.root);
+        }
+
         //destrutor
         ~Set(){
             root = _clear(root);
@@ -57,6 +62,21 @@ class Set{
 
         int size(){
             return _size(root);
+        }
+
+        void swap(Set& t){
+            Set aux(t);
+            t = *this;
+            *this = aux;
+        }
+
+        Set& operator=(const Set& var){
+            if(this != &var){
+                this->clear();
+                root = copy(var.root);
+            }
+
+            return *this;
         }
 
     private:
@@ -315,6 +335,17 @@ class Set{
             }
 
             return 1 + _size(p->left) + _size(p->right);
+        }
+
+        //função que copia árvore
+        Node* copy(Node* p){
+            if(p == nullptr){
+                return nullptr;
+            }
+            Node* node = new Node(p->key, p->height, p->left, p->right);
+            node->left = copy(p->left);
+            node->right = copy(p->right);
+            return node;
         }
 
 };
