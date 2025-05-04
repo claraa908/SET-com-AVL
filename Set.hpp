@@ -5,8 +5,6 @@
 using namespace std;
 
 class Set{
-    //publicas são as que passam chaves ou nada
-    //privadas as que passam o root como parametro
     public:
         //construtor
         Set() {
@@ -16,6 +14,13 @@ class Set{
         //construtor de cópia
         Set(const Set& copia){
             root = copy(copia.root);
+        }
+
+        Set(vector<int>& v){
+            root = nullptr;
+            for(int x : v){
+                insert(x);
+            }
         }
 
         //destrutor
@@ -34,11 +39,6 @@ class Set{
             root = _erase(root, key);
         }
 
-        //remover depois
-        void show(){
-            bshow(root, "");
-        }
-
         bool contains(int key){
             return _contains(key, root);
         }
@@ -50,11 +50,8 @@ class Set{
             root = _clear(root);
         }
 
-        int maximum(){
-            if(_empty(root)){
-                throw runtime_error("conjunto sem elementos");
-            }
-            return _maximum(root);
+        void swapSet(Set& t){
+            swap(root, t.root);
         }
 
         int minimum(){
@@ -62,6 +59,13 @@ class Set{
                 throw runtime_error("conjunto sem elementos");
             }
             return _minimum(root);
+        }
+
+        int maximum(){
+            if(_empty(root)){
+                throw runtime_error("conjunto sem elementos");
+            }
+            return _maximum(root);
         }
 
         int sucessor(int key){
@@ -92,10 +96,6 @@ class Set{
             return _empty(root) ? 0 : _size(root);
         }
 
-        void swapSet(Set& t){
-            swap(root, t.root);
-        }
-
         Set& operator=(const Set& var){
             if(this != &var){
                 this->_clear(root);
@@ -109,8 +109,14 @@ class Set{
             _inOrder(root, v);
         }
         
-        Node* getRoot() const {
-        return root;
+        void print(){
+            vector<int> val;
+            this->inOrder(val);
+
+            for (size_t i = 0; i < val.size(); ++i) {
+                cout << val[i];
+                if (i + 1 < val.size()) cout << ", ";
+            }
         }
 
     private:
@@ -236,23 +242,6 @@ class Set{
             return p;
         }
 
-        void bshow(Node *node, string heranca) const {
-        if(node != nullptr && (node->left != nullptr || node->right != nullptr))
-            bshow(node->right , heranca + "r");
-        for(int i = 0; i < (int) heranca.size() - 1; i++)
-            cout << (heranca[i] != heranca[i + 1] ? "│   " : "    ");
-        if(heranca != "")
-            cout << (heranca.back() == 'r' ? "┌───" : "└───");
-        if(node == nullptr){
-            cout << "#" << endl;
-            return;
-        }
-        cout << node->key << endl;
-        if(node != nullptr && (node->left != nullptr || node->right != nullptr))
-            bshow(node->left, heranca + "l");
-        }
-
-
         //contains
         //função booleana que recebe o primeiro nó da árvore e um determinado valor e verifica se este está na árvore
         bool _contains(int key, Node* p){
@@ -284,7 +273,7 @@ class Set{
         //função que procura o nó mais a esquerda da árvore e retorna o seu valor
         int _minimum(Node *p){
             if(_empty(p)){
-                throw runtime_error("árvore vazia") ;
+                throw runtime_error("árvore vazia");
             }
             
             while(p->left != nullptr){
@@ -297,7 +286,7 @@ class Set{
         //função que busca o nó mais a direita da árvore e retorna o seu valor
         int _maximum(Node *p){
             if(_empty(p)){
-                throw runtime_error("árvore vazia") ;
+                throw runtime_error("árvore vazia");
             }
             
             while(p->right != nullptr){
