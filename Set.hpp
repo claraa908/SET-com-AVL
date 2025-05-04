@@ -1,6 +1,7 @@
 #ifndef SET_HPP
 #define SET_HPP
 #include "Node.hpp"
+#include <vector>
 using namespace std;
 
 class Set{
@@ -26,6 +27,14 @@ class Set{
             root = _insert(root, key);
         }
 
+        void erase(int key){
+            if(!contains(key)){
+                throw invalid_argument("esse valor nao existe na arvore para remocao");
+            }
+            root = _erase(root, key);
+        }
+
+        //remover depois
         void show(){
             bshow(root, "");
         }
@@ -35,25 +44,44 @@ class Set{
         }
 
         void clear(){
+            if(_empty(root)){
+                throw runtime_error("nao ha o que limpar");
+            }
             root = _clear(root);
         }
 
         int maximum(){
+            if(_empty(root)){
+                throw runtime_error("conjunto sem elementos");
+            }
             return _maximum(root);
         }
 
         int minimum(){
+            if(_empty(root)){
+                throw runtime_error("conjunto sem elementos");
+            }
             return _minimum(root);
         }
 
         int sucessor(int key){
             Node* aux = _sucessor(key, root, nullptr);
-            return aux != nullptr ? aux->key : throw runtime_error("não há sucessor");
+
+            if(_empty(aux)){
+                throw runtime_error("nao ha sucessor para a chave fornecida");
+            }
+
+            return aux->key; 
         }
 
         int predecessor(int key){
             Node* aux = _predecessor(key, root, nullptr);
-            return aux != nullptr ? aux->key : throw runtime_error("não há predecessor");
+
+            if(_empty(aux)){
+                throw runtime_error("nao ha predecessor para a chave fornecida");
+            }
+
+            return aux->key;
         }
 
         bool empty(){
@@ -61,29 +89,35 @@ class Set{
         }
 
         int size(){
-            return _size(root);
+            return _empty(root) ? 0 : _size(root);
         }
 
-        void swap(Set& t){
-            Set aux(t);
-            t = *this;
-            *this = aux;
+        void swapSet(Set& t){
+            swap(root, t.root);
         }
 
         Set& operator=(const Set& var){
             if(this != &var){
-                this->clear();
+                this->_clear(root);
                 root = copy(var.root);
             }
 
             return *this;
         }
 
+        void inOrder(vector<int>& v){
+            _inOrder(root, v);
+        }
+        
+        Node* getRoot() const {
+        return root;
+        }
+
     private:
         Node * root;
 
         int height ( Node * node ){
-            return (node == nullptr) ? 0 : node->height;
+            return (_empty(node)) ? 0 : node->height;
         }
 
         int balance ( Node * node ){
@@ -95,8 +129,8 @@ class Set{
             p->left = u->right;
             u->right = p;
 
-            u->height = 1 +  max(height(u->left), height(u->right));
             p->height = 1 +  max(height(p->left), height(p->right));
+            u->height = 1 +  max(height(u->left), height(u->right));
             return u;
         }
 
@@ -105,14 +139,14 @@ class Set{
             p->right = u->left;
             u->left = p;
 
-            u->height = 1 +  max(height(u->left), height(u->right));
             p->height = 1 +  max(height(p->left), height(p->right));
+            u->height = 1 +  max(height(u->left), height(u->right));
             return u;
         }
 
         //insert
         Node* _insert(Node *p , int key){
-            if(p == nullptr){
+            if(_empty(p)){
                 return new Node{key, 1, nullptr, nullptr};
             }
             if(key == p->key){
@@ -127,10 +161,30 @@ class Set{
             p = fixup_insertion(p, key);
             return p;
         }
+        
+        Node* fixup_insertion( Node *p , int key ){
+            int bal = balance(p);
+            if(bal < -1 && key < p->left->key){
+                return rightRotation(p);
+            }
+            if(bal < -1 && key > p->left->key){
+                p->left = leftRotation(p->left);
+                return rightRotation(p);
+            }
+            if(bal > 1 && key > p->right->key){
+                return leftRotation(p);
+            }
+            if(bal > 1 && key < p->right->key){
+                p->right = rightRotation(p->right);
+                return leftRotation(p);
+            }
+            p->height = 1 + max(height(p->left), height(p->right));
+            return p;
+        }
 
         //erase
         Node* _erase(Node* p, int key){
-            if(p == nullptr){
+            if(_empty(p)){
                 return nullptr;
             }
             if(key < p->key){
@@ -150,7 +204,7 @@ class Set{
         }
 
         Node* remove_successor(Node* node, Node* p){
-            if(p->left != nullptr){
+            if(!_empty(p->left)){
                 p = remove_successor(node, p->left);
             }else{
                 node->key = p->key;
@@ -182,26 +236,6 @@ class Set{
             return p;
         }
 
-        Node* fixup_insertion( Node *p , int key ){
-            int bal = balance(p);
-            if(bal < -1 && key < p->left->key){
-                return rightRotation(p);
-            }
-            if(bal < -1 && key > p->left->key){
-                p->left = leftRotation(p);
-                return rightRotation(p);
-            }
-            if(bal > 1 && key > p->right->key){
-                return leftRotation(p);
-            }
-            if(bal > 1 && key < p->right->key){
-                p->right = rightRotation(p);
-                return leftRotation(p);
-            }
-            p->height = 1 + max(height(p->left), height(p->right));
-            return p;
-        }
-
         void bshow(Node *node, string heranca) const {
         if(node != nullptr && (node->left != nullptr || node->right != nullptr))
             bshow(node->right , heranca + "r");
@@ -222,7 +256,7 @@ class Set{
         //contains
         //função booleana que recebe o primeiro nó da árvore e um determinado valor e verifica se este está na árvore
         bool _contains(int key, Node* p){
-            if(p == nullptr){
+            if(_empty(p)){
                 return false;
             }
             if(key == p->key){
@@ -249,7 +283,7 @@ class Set{
         //minimum
         //função que procura o nó mais a esquerda da árvore e retorna o seu valor
         int _minimum(Node *p){
-            if(p == nullptr){
+            if(_empty(p)){
                 throw runtime_error("árvore vazia") ;
             }
             
@@ -262,7 +296,7 @@ class Set{
         //maximum
         //função que busca o nó mais a direita da árvore e retorna o seu valor
         int _maximum(Node *p){
-            if(p == nullptr){
+            if(_empty(p)){
                 throw runtime_error("árvore vazia") ;
             }
             
@@ -274,7 +308,7 @@ class Set{
 
         //successor
         Node* _sucessor(int key, Node* p, Node* f){
-            if(p == nullptr){
+            if(_empty(p)){
                 return nullptr;
             }
 
@@ -302,7 +336,7 @@ class Set{
 
         //predecessor
         Node* _predecessor(int key, Node* p, Node* f){
-            if(p == nullptr){
+            if(_empty(p)){
                 return nullptr;
             }
 
@@ -319,7 +353,6 @@ class Set{
             if(p->key < key){
                 return _predecessor(key, p->right, p);
             }
-
             return nullptr;
         }
 
@@ -327,25 +360,34 @@ class Set{
         bool _empty(Node *p){
             return (p == nullptr) ? true : false;
         }
+        
+        //função que copia árvore
+        Node* copy(Node* p){
+            if(_empty(p))return nullptr;
+
+            Node* left = copy(p->left);
+            Node* right = copy(p->right);
+            int novaAltura = 1 + max(height(left), height(right));
+
+            Node* node = new Node(p->key, novaAltura, left, right);
+            return node;
+        }
 
         //size
         int _size(Node *p){
-            if(p == nullptr){
+            if(_empty(p)){
                 return 0;
             }
 
             return 1 + _size(p->left) + _size(p->right);
         }
-
-        //função que copia árvore
-        Node* copy(Node* p){
-            if(p == nullptr){
-                return nullptr;
+        
+        void _inOrder(Node* p, vector<int>& v){
+            if(p != nullptr){
+            _inOrder(p->left, v);
+            v.push_back(p->key);
+            _inOrder(p->right, v);
             }
-            Node* node = new Node(p->key, p->height, p->left, p->right);
-            node->left = copy(p->left);
-            node->right = copy(p->right);
-            return node;
         }
 
 };
