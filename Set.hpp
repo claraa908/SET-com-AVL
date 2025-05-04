@@ -16,6 +16,7 @@ class Set{
             root = copy(copia.root);
         }
 
+        //construtor que recebe um vetor e coloca cada valor do vetor na arvore
         Set(vector<int>& v){
             root = nullptr;
             for(int x : v){
@@ -28,10 +29,12 @@ class Set{
             root = _clear(root);
         }
 
+        //função publica que insere um no
         void insert(int key){
             root = _insert(root, key);
         }
 
+        //função publica que apaga um no
         void erase(int key){
             if(!contains(key)){
                 throw invalid_argument("esse valor nao existe na arvore para remocao");
@@ -39,10 +42,12 @@ class Set{
             root = _erase(root, key);
         }
 
+        //função publica que retorna se um nó está ou não na árvore
         bool contains(int key){
             return _contains(key, root);
         }
 
+        //função publica que limpa a arvore
         void clear(){
             if(_empty(root)){
                 throw runtime_error("nao ha o que limpar");
@@ -50,10 +55,12 @@ class Set{
             root = _clear(root);
         }
 
+        //função que inverte as arvores, a arvore A recebe a B e a B recebe a A
         void swapSet(Set& t){
             swap(root, t.root);
         }
 
+        //função publica que retorna o minimo
         int minimum(){
             if(_empty(root)){
                 throw runtime_error("conjunto sem elementos");
@@ -61,6 +68,7 @@ class Set{
             return _minimum(root);
         }
 
+        //função publica que retorna o maximo
         int maximum(){
             if(_empty(root)){
                 throw runtime_error("conjunto sem elementos");
@@ -68,16 +76,17 @@ class Set{
             return _maximum(root);
         }
 
+        //função publica do sucessor
         int sucessor(int key){
             Node* aux = _sucessor(key, root, nullptr);
 
             if(_empty(aux)){
                 throw runtime_error("nao ha sucessor para a chave fornecida");
             }
-
             return aux->key; 
         }
 
+        //função publica do predecessor
         int predecessor(int key){
             Node* aux = _predecessor(key, root, nullptr);
 
@@ -88,27 +97,31 @@ class Set{
             return aux->key;
         }
 
+        //função publica que retorna se uma árvore é vazia ou não
         bool empty(){
             return _empty(root);
         }
 
+        //função publica que retorna quantos nós uma árvore possui
         int size(){
             return _empty(root) ? 0 : _size(root);
         }
 
+        //sobrecarga do operador de atribuição
         Set& operator=(const Set& var){
             if(this != &var){
                 this->_clear(root);
                 root = copy(var.root);
             }
-
             return *this;
         }
 
+        //função publica de ordem simetrica
         void inOrder(vector<int>& v){
             _inOrder(root, v);
         }
         
+        //função que printa a árvore de forma simétrica
         void print(){
             vector<int> val;
             this->inOrder(val);
@@ -122,14 +135,17 @@ class Set{
     private:
         Node * root;
 
+        //fução que calcula a altura da arvore/subarvore
         int height ( Node * node ){
             return (_empty(node)) ? 0 : node->height;
         }
 
+        //funão que calcula o balance da arvore/subarvore
         int balance ( Node * node ){
             return height(node->right) - height(node->left);
         }
 
+        //função que rotaciona uma arvore/subarvore para direita
         Node * rightRotation (Node *p){
             Node* u = p->left;
             p->left = u->right;
@@ -140,6 +156,7 @@ class Set{
             return u;
         }
 
+        //função que rotaciona uma arvore/subarvore para esquerda
         Node * leftRotation (Node *p){
             Node* u = p->right;
             p->right = u->left;
@@ -151,6 +168,7 @@ class Set{
         }
 
         //insert
+        //função que adiciona um nó sem desbalancear a arvore
         Node* _insert(Node *p , int key){
             if(_empty(p)){
                 return new Node{key, 1, nullptr, nullptr};
@@ -168,6 +186,7 @@ class Set{
             return p;
         }
         
+        //função que conserta o balanço da arvore após uma inserção
         Node* fixup_insertion( Node *p , int key ){
             int bal = balance(p);
             if(bal < -1 && key < p->left->key){
@@ -189,6 +208,7 @@ class Set{
         }
 
         //erase
+        //função que remove um nó sem desbalancear a arvore
         Node* _erase(Node* p, int key){
             if(_empty(p)){
                 return nullptr;
@@ -209,6 +229,7 @@ class Set{
             return p;
         }
 
+        //função que remove o sucessor de um nó
         Node* remove_successor(Node* node, Node* p){
             if(!_empty(p->left)){
                 p = remove_successor(node, p->left);
@@ -222,6 +243,7 @@ class Set{
             return p;
         }
 
+        //função que conserta o balanço da arvore após uma remoção
         Node* fixup_erase(Node* p){
             int bal = balance(p);
             if(bal < -1 && balance(p->left) <= 0){
@@ -260,6 +282,7 @@ class Set{
         }
 
         //clear
+        //função privada que deleta os nos em pos ordem
         Node* _clear(Node* p){
             if(p != nullptr){
                 p->left = _clear(p->left);
@@ -296,6 +319,7 @@ class Set{
         }
 
         //successor
+        //função privada que busca o sucessor em ordem crescente de um no da arvore
         Node* _sucessor(int key, Node* p, Node* f){
             if(_empty(p)){
                 return nullptr;
@@ -324,6 +348,7 @@ class Set{
         }
 
         //predecessor
+        //função privada que busca o sucessor em ordem crescente de um no da arvore
         Node* _predecessor(int key, Node* p, Node* f){
             if(_empty(p)){
                 return nullptr;
@@ -346,11 +371,12 @@ class Set{
         }
 
         //empty
+        //função que verifica se a arvore é vazia ou não
         bool _empty(Node *p){
             return (p == nullptr) ? true : false;
         }
         
-        //função que copia árvore
+        //função privada que copia árvore
         Node* copy(Node* p){
             if(_empty(p))return nullptr;
 
@@ -363,6 +389,7 @@ class Set{
         }
 
         //size
+        //função privada que retorna o quantidade de nos que a arvore possui
         int _size(Node *p){
             if(_empty(p)){
                 return 0;
@@ -371,6 +398,8 @@ class Set{
             return 1 + _size(p->left) + _size(p->right);
         }
         
+        //ordem simetrica
+        //função privada que adiciona os nós da arvore em ordem crescente em um vetor
         void _inOrder(Node* p, vector<int>& v){
             if(p != nullptr){
             _inOrder(p->left, v);
